@@ -122,7 +122,7 @@ class TeamCityFormatter < Cucumber::Ast::Visitor
   # return a string formatted for use by teamcity which includes all messages
   # if :purge is true (the default), then the buffer is also emptied
   def step_messages(opt={})
-    purge = opt[:purge]||true
+    purge = opt[:purge].nil? ? true : opt[:purge]
     ret=''
     return ret if @test_output.empty?
     ret=@test_output.join('|n') #teamcity escaped newline
