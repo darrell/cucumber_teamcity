@@ -28,10 +28,10 @@ class TeamCityFormatter < Cucumber::Ast::Visitor
     name=name.split("\n").first
     @current_feature=name if @current_feature.nil?
     if name != @current_feature
-      testsuite_finish(@current_feature)
+      feature_finish(@current_feature)
       @current_feature=name
     end
-    testsuite_start(@current_feature)
+    feature_start(@current_feature)
   end
 
   def visit_exception(exception, status)
@@ -44,16 +44,16 @@ class TeamCityFormatter < Cucumber::Ast::Visitor
     line=format_step(keyword, step_match, status)
     @current_step=line
     if status != :passed
-      test_message(line, 'WARNING')
+      step_message(line, 'WARNING')
     else
-      test_message(line)
+      step_message(line)
     end
     super
     # this has to be (re-)defined here, since cucumber does
     # not provide hooks at the end of a test(suite), and we want
     # to let teamcity know we've finished
     $_TEAMCITY_EXIT_MESSAGE=%Q(
-#{test_messages(:purge => false)}
+#{step_messages(:purge => false)}
 ##teamcity[testFinished name='#{@current_feature_element}']
 ##teamcity[testSuiteFinished name='#{@current_feature}']
     )
@@ -72,10 +72,10 @@ class TeamCityFormatter < Cucumber::Ast::Visitor
     end
     @current_feature_element=line if @current_feature_element.nil?
     if line != @current_feature_element
-      test_finish(@current_feature_element)
+      scenario_finish(@current_feature_element)
       @current_feature_element=line
     end
-    test_start(line)
+    scenario_start(line)
 
   end
  
@@ -83,31 +83,31 @@ class TeamCityFormatter < Cucumber::Ast::Visitor
   # = Logging Methods
   #
   
-  # log the beginning of a scenario
-  def testsuite_start(msg, io=@io)
+  # log the beginning of a feature
+  def feature_start(msg, io=@io)
     msg=teamcity_escape(msg)
     io.puts "##teamcity[testSuiteStarted #{timestamp} name='#{msg}']"
     io.flush
   end
 
   # log the end of a feature
-  def testsuite_finish(msg, io=@io)
+  def feature_finish(msg, io=@io)
     msg=teamcity_escape(msg)
     io.puts "##teamcity[testSuiteFinished #{timestamp} name='#{msg}']"
     io.flush
   end
 
   # log the start of a scenario
-  def test_start(msg)
+  def scenario_start(msg)
     msg=teamcity_escape(msg)
     @io.puts "##teamcity[testStarted #{timestamp} name='#{msg}' captureStandardOutput='true']"
     @io.flush
   end
 
   # log the end of a scenario
-  def test_finish(msg)
+  def scenario_finish(msg)
     msg=teamcity_escape(msg)
-    @io.puts test_messages(:purge => true)
+    @io.puts step_messages(:purge => true)
     @io.puts "##teamcity[testFinished #{timestamp} name='#{msg}']"
     @io.flush
   end
@@ -115,13 +115,13 @@ class TeamCityFormatter < Cucumber::Ast::Visitor
   # add a message from step output to buffer
   # right now, type is ignored, since we have no reasonably
   # attractive way to add that to teamcity
-  def test_message(msg, type = 'NORMAL')
+  def step_message(msg, type = 'NORMAL')
     @test_output.push(teamcity_escape(msg))
   end
 
   # return a string formatted for use by teamcity which includes all messages
   # if :purge is true (the default), then the buffer is also emptied
-  def test_messages(opt={})
+  def step_messages(opt={})
     purge = opt[:purge]||true
     ret=''
     return ret if @test_output.empty?
@@ -132,7 +132,7 @@ class TeamCityFormatter < Cucumber::Ast::Visitor
   
   # Log a test failure
   def test_failure(msg, details='')
-    # teamcity wants on a single failure per test,
+    # teamcity wants only a single failure per test,
     # but since tests are scenarios, not steps,
     # we need to log only once per scenario
     return unless @failed_scenarios[@current_feature_element].nil?
