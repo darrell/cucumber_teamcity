@@ -1,0 +1,5 @@
+*.patch
+doc/*
+.*.swp
+.DS_Store
+._*
