@@ -1,0 +1,31 @@
+== A basic Cucumber Formatter for TeamCity
+
+Tested with {Cucumber}[http://github.com/aslakhellesoy/cucumber/tree] 0.2.3 -> 0.3.6 and {TeamCity}[http://www.jetbrains.com/teamcity/index.html] 4.0.2 and 4.5.1.
+== Install
+
+Just copy <tt>teamcity_formatter</tt> to <tt>features/support/</tt>
+
+Then add <tt>-f TeamCityFormatter</tt> to your cucumber command-line. 
+
+Right now, it seems that if you specify multiple formatters, cucumber will
+not output the final one to stdout, so you may want to make sure this is
+the only formatter used in your testing. (Alternatively, you could
+write to <tt>/dev/stdout</tt> if your system supports that, but right now,
+cucumber seems to not like that option.)
+
+Terminology maps this way:
+
+* Cucumber -> TeamCity
+* Feature -> TestSuite
+* Scenario -> Test
+* Step -> No mapping, but steps will raise errors in the test
+
+== Notes
+
+I haven't tested this with Scenario Outlines, or a few other features,
+so your output may vary. Please feel free to submit patches.
+
+== License
+Do what you will, but give credit.
+
+darrell [at] garnix.org
