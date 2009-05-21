@@ -20,10 +20,16 @@ Terminology maps this way:
 * Scenario -> Test
 * Step -> No mapping, but steps will raise errors in the test
 
+In Scenario Outlines, all values are kept together in a test. This
+is still true if you are using the new --expand option, since you
+presumably would like to track the name of the test that failed,
+not not just the numbers in the table.
+
 == Notes
 
-I haven't tested this with Scenario Outlines, or a few other features,
-so your output may vary. Please feel free to submit patches.
+
+We are not necessarily using all the features of cucumber in house,
+so please feel free to submit patches.
 
 == License
 Do what you will, but give credit.

@@ -67,6 +67,10 @@ class TeamCityFormatter < Cucumber::Ast::Visitor
   # Because cucumber does not provide begin and end hooks,
   # we store the scenario name and issue a Finished when it changes
   def visit_feature_element_name(keyword, name, file_colon_line, source_indent)
+    # we do not want to treat expanded scenario outlines
+    # as new tests, so we assume anything sarting with a pipe
+    # is a scenario expansion
+    return true if options[:expand] && name =~ /^|/
     line = %Q("#{name}")
     @current_feature_element=line if @current_feature_element.nil?
     if line != @current_feature_element
@@ -74,7 +78,20 @@ class TeamCityFormatter < Cucumber::Ast::Visitor
       @current_feature_element=line
     end
     scenario_start(line)
+  end
+  
+  def visit_outline_table(outline_table)
+    step_message("#{timestamp_short} running outline: ")
+    super
+  end
 
+  def visit_table_row(table_row)
+    super
+    if table_row.exception
+      test_failure(format_table_row(table_row, :failed),format_exception(table_row.exception))
+    else
+      step_message(format_table_row(table_row))
+    end
   end
  
   #
@@ -154,6 +171,11 @@ class TeamCityFormatter < Cucumber::Ast::Visitor
 
   def format_exception(exception)
     (["#{exception.message} (#{exception.class})"] + exception.backtrace).join("\n")
+  end
+
+  def format_table_row(row, status = :passed)
+    #keep same basic formatting as format_step
+    %q{%s %10s %-90s @ %s} % [timestamp_short, status, row.name, row.line]
   end
 
   # make necessary escapes for teamcity
