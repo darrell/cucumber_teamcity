@@ -15,7 +15,8 @@ class TeamCityFormatter < Cucumber::Ast::Visitor
     # our final exit message. Oh, for the want of a destructor.
     $_TEAMCITY_EXIT_MESSAGE=nil
     at_exit do
-      puts $_TEAMCITY_EXIT_MESSAGE unless $_TEAMCITY_EXIT_MESSAGE.nil?
+      $stdout.puts $_TEAMCITY_EXIT_MESSAGE unless $_TEAMCITY_EXIT_MESSAGE.nil?
+      $stdout.flush
     end
   end
 
@@ -67,9 +68,6 @@ class TeamCityFormatter < Cucumber::Ast::Visitor
   # we store the scenario name and issue a Finished when it changes
   def visit_feature_element_name(keyword, name, file_colon_line, source_indent)
     line = %Q("#{name}")
-    if @options[:source]
-      line = line + ' @ ' + file_colon_line
-    end
     @current_feature_element=line if @current_feature_element.nil?
     if line != @current_feature_element
       scenario_finish(@current_feature_element)
