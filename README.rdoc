@@ -1,6 +1,10 @@
 == A basic Cucumber Formatter for TeamCity
 
-Tested with {Cucumber}[http://github.com/aslakhellesoy/cucumber/tree] 0.2.3 -> 0.3.6 and {TeamCity}[http://www.jetbrains.com/teamcity/index.html] 4.0.2 and 4.5.1.
+Tested with {Cucumber}[http://github.com/aslakhellesoy/cucumber/tree] 0.2.3 -> 0.3.6 and {TeamCity}[http://www.jetbrains.com/teamcity/index.html] 4.0.2 and 4.5.x.
+
+Apparently, TeamCity 5.x will have native cucumber support, obviating this formatter. But I'll leave it here
+for people who still run 4.x.
+
 == Install
 
 Just copy <tt>teamcity_formatter</tt> to <tt>features/support/</tt>
