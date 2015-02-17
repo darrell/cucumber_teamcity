@@ -1,9 +1,8 @@
 == A basic Cucumber Formatter for TeamCity
 
-Tested with {Cucumber}[http://github.com/aslakhellesoy/cucumber/tree] 0.2.3 -> 0.3.6 and {TeamCity}[http://www.jetbrains.com/teamcity/index.html] 4.0.2 and 4.5.x.
+Tested with {Cucumber}[http://github.com/aslakhellesoy/cucumber/tree] 1.3.18 and {TeamCity}[http://www.jetbrains.com/teamcity/index.html] 8.x.x.
 
-Apparently, TeamCity 5.x will have native cucumber support, obviating this formatter. But I'll leave it here
-for people who still run 4.x.
+Although teamcity has native support but the default formatter interprets every step as a separate test which does not reflect reality.
 
 == Install
 
@@ -31,11 +30,11 @@ not not just the numbers in the table.
 
 == Notes
 
-
 We are not necessarily using all the features of cucumber in house,
 so please feel free to submit patches.
 
 == License
 Do what you will, but give credit.
 
-darrell [at] garnix.org
+darrell [at] garnix.org <- Original author
+ankur [at] malloc64.com
