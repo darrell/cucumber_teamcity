@@ -1,7 +1,6 @@
-class TeamCityFormatter < Cucumber::Ast::Visitor
-  
-  def initialize(step_mother, io, options, delim='|')
-    super(step_mother)
+class TeamCityFormatter
+
+  def initialize(step_mother, io, options)
     @io = io
     @options = options
     @current_feature_element = nil
@@ -20,12 +19,7 @@ class TeamCityFormatter < Cucumber::Ast::Visitor
     end
   end
 
-  # = AST Visitor hooks
-  
-  # Hook for new feature.
-  # Because cucumber does not provide begin and end hooks,
-  # we store the feature name and issue a Finished when it changes
-  def visit_feature_name(name)
+  def feature_name(name, something)
     name=name.split("\n").first
     @current_feature=name if @current_feature.nil?
     if name != @current_feature
@@ -35,13 +29,13 @@ class TeamCityFormatter < Cucumber::Ast::Visitor
     feature_start(@current_feature)
   end
 
-  def visit_exception(exception, status)
+  def exception(exception, status)
     test_failure(@current_step,format_exception(exception)) if status == :failed
   end
 
   # put each step into the messages buffer. Because of the way teamcity formats
   # output, we want to output all our messages at the same time
-  def visit_step_name(keyword, step_match, status, source_indent, background)
+  def step_name(keyword, step_match, status, source_indent, background)
     line=format_step(keyword, step_match, status)
     @current_step=line
     if status != :passed
@@ -49,7 +43,6 @@ class TeamCityFormatter < Cucumber::Ast::Visitor
     else
       step_message(line)
     end
-    super
     # this has to be (re-)defined here, since cucumber does
     # not provide hooks at the end of a test(suite), and we want
     # to let teamcity know we've finished
@@ -60,7 +53,7 @@ class TeamCityFormatter < Cucumber::Ast::Visitor
     )
   end
 
-  def visit_scenario_name(keyword, name, file_colon_line, source_indent)
+  def scenario_name(keyword, name, file_colon_line, source_indent)
     visit_feature_element_name(keyword, name, file_colon_line, source_indent)
   end
 
@@ -70,7 +63,7 @@ class TeamCityFormatter < Cucumber::Ast::Visitor
     # we do not want to treat expanded scenario outlines
     # as new tests, so we assume anything sarting with a pipe
     # is a scenario expansion
-    return true if options[:expand] && name =~ /^|/
+    return true if @options[:expand] && name =~ /^|/
     line = %Q("#{name}")
     @current_feature_element=line if @current_feature_element.nil?
     if line != @current_feature_element
@@ -79,25 +72,23 @@ class TeamCityFormatter < Cucumber::Ast::Visitor
     end
     scenario_start(line)
   end
-  
-  def visit_outline_table(outline_table)
+
+  def before_outline_table(outline_table)
     step_message("#{timestamp_short} running outline: ")
-    super
   end
 
-  def visit_table_row(table_row)
-    super
+  def after_table_row(table_row)
     if table_row.exception
       test_failure(format_table_row(table_row, :failed),format_exception(table_row.exception))
     else
       step_message(format_table_row(table_row))
     end
   end
- 
+
   #
   # = Logging Methods
   #
-  
+
   # log the beginning of a feature
   def feature_start(msg, io=@io)
     msg=teamcity_escape(msg)
@@ -144,7 +135,7 @@ class TeamCityFormatter < Cucumber::Ast::Visitor
     @test_output=[] if purge
     return "##teamcity[message text='|n#{ret}|n']"
   end
-  
+
   # Log a test failure
   def test_failure(msg, details='')
     # teamcity wants only a single failure per test,
@@ -158,11 +149,11 @@ class TeamCityFormatter < Cucumber::Ast::Visitor
     @io.puts "##teamcity[testFailed #{timestamp} name='#{name}' message='#{msg}' details='#{details}']"
     @io.flush
   end
-  
+
   private
-  
+
   # = Formating Methods
-  
+
   def format_step(keyword, step_match, status)
     %q{%s %10s %s %-90s @ %s} % [timestamp_short, status, keyword,
                                      step_match.format_args(lambda{|param| param}),
