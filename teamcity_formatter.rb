@@ -35,7 +35,7 @@ class TeamCityFormatter
 
   # put each step into the messages buffer. Because of the way teamcity formats
   # output, we want to output all our messages at the same time
-  def step_name(keyword, step_match, status, source_indent, background)
+  def step_name(keyword, step_match, status, source_indent, background, file_colon_line)
     line=format_step(keyword, step_match, status)
     @current_step=line
     if status != :passed
