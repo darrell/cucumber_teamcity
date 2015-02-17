@@ -1,6 +1,6 @@
 == A basic Cucumber Formatter for TeamCity
 
-Tested with {Cucumber}[http://github.com/aslakhellesoy/cucumber/tree] 1.3.18 and {TeamCity}[http://www.jetbrains.com/teamcity/index.html] 8.x.x.
+Tested with {Cucumber}[http://github.com/cucumber/cucumber] 1.3.18 and {TeamCity}[http://www.jetbrains.com/teamcity/index.html] 8.x.x.
 
 Although teamcity has native support but the default formatter interprets every step as a separate test which does not reflect reality.
 
