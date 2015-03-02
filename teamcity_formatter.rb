@@ -19,7 +19,7 @@ class TeamCityFormatter
     end
   end
 
-  def feature_name(name, something)
+  def feature_name(keyword, name)
     name=name.split("\n").first
     @current_feature=name if @current_feature.nil?
     if name != @current_feature
