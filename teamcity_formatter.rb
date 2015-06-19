@@ -166,7 +166,7 @@ class TeamCityFormatter
 
   def format_table_row(row, status = :passed)
     #keep same basic formatting as format_step
-    %q{%s %10s %-90s @ %s} % [timestamp_short, status, row.name, row.line]
+    %q{%s %10s %-90s @ %s} % [timestamp_short, status, row.name, row.line] unless row[0].line == -1
   end
 
   # make necessary escapes for teamcity
